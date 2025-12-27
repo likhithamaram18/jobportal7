@@ -11,6 +11,7 @@ interface AuthContextType {
   session: Session | null;
   role: AppRole | null;
   loading: boolean;
+  fullName: string | null;
   signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -23,6 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fullName, setFullName] = useState<string | null>(null);
 
   const fetchUserRole = async (userId: string) => {
     const { data, error } = await supabase
@@ -42,13 +44,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        const currentUser = session?.user ?? null;
         setSession(session);
-        setUser(session?.user ?? null);
+        setUser(currentUser);
+        setFullName(currentUser?.user_metadata?.full_name || null);
 
         // Defer role fetching with setTimeout to avoid deadlock
-        if (session?.user) {
+        if (currentUser) {
           setTimeout(() => {
-            fetchUserRole(session.user.id).then(setRole);
+            fetchUserRole(currentUser.id).then(setRole);
           }, 0);
         } else {
           setRole(null);
@@ -59,10 +63,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      const currentUser = session?.user ?? null;
       setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserRole(session.user.id).then(setRole);
+      setUser(currentUser);
+      setFullName(currentUser?.user_metadata?.full_name || null);
+      if (currentUser) {
+        fetchUserRole(currentUser.id).then(setRole);
       }
       setLoading(false);
     });
@@ -141,10 +147,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     setSession(null);
     setRole(null);
+    setFullName(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, loading, fullName, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
