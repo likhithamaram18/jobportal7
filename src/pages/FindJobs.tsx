@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, MapPin, DollarSign, Clock, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 // Assuming Job and Company types from a types file
 export interface Company {
@@ -30,9 +30,7 @@ export interface Job {
   salary_min?: number;
   salary_max?: number;
   is_remote: boolean;
-  recruiter: {
-    company_name: string;
-  } | null;
+  company_name: string;
   created_at: string;
 }
 
@@ -42,9 +40,9 @@ const JobCard = ({ job, onApply, isApplied }: { job: Job; onApply: (jobId: strin
       <div className="flex justify-between items-start">
         <div>
           <CardTitle className="text-lg font-bold">{job.title}</CardTitle>
-          <p className="text-sm text-muted-foreground">{job.recruiter?.company_name}</p>
+          <p className="text-sm text-muted-foreground">{job.company_name}</p>
         </div>
-        <img src={`https://logo.clearbit.com/${job.recruiter?.company_name.toLowerCase().replace(/ /g, '')}.com`} alt={`${job.recruiter?.company_name} logo`} className="h-12 w-12 object-contain rounded-md" />
+        <img src={`https://logo.clearbit.com/${job.company_name.toLowerCase().replace(/ /g, '')}.com`} alt={`${job.company_name} logo`} className="h-12 w-12 object-contain rounded-md" />
       </div>
     </CardHeader>
     <CardContent>
@@ -83,64 +81,22 @@ const FindJobsPage = () => {
   const [locationFilter, setLocationFilter] = useState("");
   const [jobTypeFilter, setJobTypeFilter] = useState("");
 
-  const { user } = useAuth();
-  const [applications, setApplications] = useState<any[]>([]);
+  const [applications, setApplications] = useState<string[]>([]);
+  const { user, role } = useAuth();
+  const navigate = useNavigate();
+
+  const postedJobs: Job[] = [
+    { id: "1", title: 'Software Engineer', company_name: "Innovate Inc.", description: "We are looking for a talented software engineer to join our team.", job_type: "Full-time", location: "San Francisco, CA", salary_min: 120000, salary_max: 150000, is_remote: false, created_at: "2024-05-20T10:00:00Z" },
+    { id: "2", title: 'Product Manager', company_name: "Quantum Solutions", description: "We are looking for an experienced product manager to lead our product development.", job_type: "Full-time", location: "New York, NY", salary_min: 140000, salary_max: 170000, is_remote: false, created_at: "2024-05-18T14:30:00Z" },
+    { id: "3", title: 'UX Designer', company_name: "Creative Minds", description: "We are looking for a creative UX designer to design our new mobile app.", job_type: "Contract", location: "Los Angeles, CA", salary_min: 80000, salary_max: 100000, is_remote: true, created_at: "2024-05-15T12:00:00Z" },
+  ];
 
   useEffect(() => {
-    const fetchJobs = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("jobs")
-        .select(`
-          id,
-          title,
-          description,
-          job_type,
-          location,
-          salary_min,
-          salary_max,
-          is_remote,
-          created_at,
-          recruiter:recruiter_profiles ( company_name )
-        `)
-        .eq("is_active", true)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching jobs:", error);
-        toast.error("Failed to fetch jobs.");
-      } else {
-        // The query returns recruiter as an object, not an array, so we can cast it directly
-        const fetchedJobs = data.map(job => ({
-          ...job,
-          recruiter: job.recruiter
-        }));
-        setJobs(fetchedJobs as unknown as Job[]);
-        setFilteredJobs(fetchedJobs as unknown as Job[]);
-      }
-      setLoading(false);
-    };
-
-    fetchJobs();
+    setLoading(true);
+    setJobs(postedJobs);
+    setFilteredJobs(postedJobs);
+    setLoading(false);
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      const fetchApplications = async () => {
-        const { data, error } = await supabase
-          .from('applications')
-          .select('job_id')
-          .eq('student_id', user.id);
-
-        if (error) {
-          console.error('Error fetching applications:', error);
-        } else {
-          setApplications(data);
-        }
-      };
-      fetchApplications();
-    }
-  }, [user]);
 
   useEffect(() => {
     let filtered = jobs;
@@ -148,7 +104,7 @@ const FindJobsPage = () => {
     if (searchTerm) {
       filtered = filtered.filter(job =>
         job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.recruiter?.company_name.toLowerCase().includes(searchTerm.toLowerCase())
+        job.company_name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -165,42 +121,15 @@ const FindJobsPage = () => {
 
   const handleApply = async (jobId: string) => {
     if (!user) {
-      toast.error("You must be logged in to apply.");
+      navigate("/auth");
       return;
     }
-    
-    // Check if the user has a student profile
-    const { data: profile, error: profileError } = await supabase
-      .from('student_profiles')
-      .select('id, resume_url')
-      .eq('user_id', user.id)
-      .single();
-
-    if (profileError || !profile) {
-        toast.error("You must complete your student profile before applying.");
-        // Optionally redirect to profile page
+    if (role !== 'student') {
+        toast.error("Only students can apply for jobs.");
         return;
     }
-
-    if (!profile.resume_url) {
-        toast.error("Please upload a resume in your profile before applying.");
-        return;
-    }
-
-    const { error } = await supabase.from('applications').insert({ 
-      job_id: jobId, 
-      student_id: user.id,
-      status: 'applied',
-      resume_url: profile.resume_url
-    });
-
-    if (error) {
-      toast.error("Failed to submit application. You may have already applied.");
-      console.error('Error applying:', error);
-    } else {
-      toast.success("Application submitted successfully!");
-      setApplications([...applications, { job_id: jobId }]);
-    }
+    toast.success("Application submitted successfully!");
+    setApplications([...applications, jobId]);
   };
 
   const uniqueLocations = [...new Set(jobs.map(job => job.location).filter(Boolean))];
@@ -267,7 +196,7 @@ const FindJobsPage = () => {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredJobs.map(job => (
-            <JobCard key={job.id} job={job} onApply={handleApply} isApplied={applications.some(a => a.job_id === job.id)} />
+            <JobCard key={job.id} job={job} onApply={handleApply} isApplied={applications.includes(job.id)} />
           ))}
         </div>
       )}

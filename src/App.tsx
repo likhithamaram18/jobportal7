@@ -13,6 +13,11 @@ import StudentProfile from "./pages/student/Profile";
 import FindJobsPage from "./pages/FindJobs";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
+import AboutPage from "./pages/About";
+import ForRecruitersPage from "./pages/ForRecruiters";
+import CompaniesPage from "./pages/Companies";
+import RecruiterDashboard from "./pages/recruiter/Dashboard";
+import PostJobForm from "./pages/recruiter/PostJobForm";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +32,9 @@ const App = () => (
             <Route path="/" element={<Layout />}>
               <Route index element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/for-recruiters" element={<ForRecruitersPage />} />
+              <Route path="/companies" element={<CompaniesPage />} />
               <Route
                 path="/jobs"
                 element={
@@ -51,6 +59,26 @@ const App = () => (
                   <ProtectedRoute allowedRoles={["student"]}>
                     <ErrorBoundary>
                       <StudentProfile />
+                    </ErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/recruiter/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={["recruiter"]}>
+                    <ErrorBoundary>
+                      <RecruiterDashboard />
+                    </ErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+               <Route
+                path="/recruiter/post-job"
+                element={
+                  <ProtectedRoute allowedRoles={["recruiter"]}>
+                    <ErrorBoundary>
+                      <PostJobForm />
                     </ErrorBoundary>
                   </ProtectedRoute>
                 }

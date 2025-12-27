@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Briefcase, Menu, X } from "lucide-react";
 import { useState } from "react";
@@ -16,12 +16,16 @@ import {
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, fullName, signOut } = useAuth();
+  const { user, fullName, signOut, role } = useAuth();
+  const navigate = useNavigate();
 
   const navLinks = [
     { label: "Find Jobs", href: "/jobs" },
     { label: "Companies", href: "/companies" },
-    { label: "For Recruiters", href: "/recruiters" },
+    { 
+      label: "For Recruiters", 
+      href: role === 'recruiter' ? '/recruiter/dashboard' : '/for-recruiters' 
+    },
     { label: "About", href: "/about" },
   ];
 
@@ -42,7 +46,7 @@ const Navbar = () => {
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => (
             <Link
-              key={link.href}
+              key={link.label}
               to={link.href}
               className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
             >
@@ -54,25 +58,38 @@ const Navbar = () => {
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-3">
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Avatar className="cursor-pointer">
-                  <AvatarFallback>{fullName ? fullName[0].toUpperCase() : ''}</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/student/dashboard">Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/student/profile">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={signOut}>Sign Out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+             {role === 'recruiter' && (
+                <Button 
+                  variant="hero"
+                  size="sm"
+                  onClick={() => navigate('/recruiter/post-job')}
+                >
+                  Post a Job
+                </Button>
+              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className="cursor-pointer">
+                    <AvatarFallback>{fullName ? fullName[0].toUpperCase() : ''}</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to={role === 'student' ? '/student/dashboard' : '/recruiter/dashboard'}>Dashboard</Link>
+                  </DropdownMenuItem>
+                  {role === 'student' && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/student/profile">Profile</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={signOut}>Sign Out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
             <>
               <Button variant="ghost" size="sm" asChild>

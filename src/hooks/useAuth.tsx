@@ -1,8 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 type AppRole = "student" | "recruiter" | "admin";
 
@@ -41,40 +39,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        const currentUser = session?.user ?? null;
-        setSession(session);
-        setUser(currentUser);
-        setFullName(currentUser?.user_metadata?.full_name || null);
-
-        // Defer role fetching with setTimeout to avoid deadlock
-        if (currentUser) {
-          setTimeout(() => {
-            fetchUserRole(currentUser.id).then(setRole);
-          }, 0);
-        } else {
-          setRole(null);
-        }
-        setLoading(false);
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initializeAuth = async () => {
+      // First, check for an existing session
+      const { data: { session }, } = await supabase.auth.getSession();
       const currentUser = session?.user ?? null;
       setSession(session);
       setUser(currentUser);
       setFullName(currentUser?.user_metadata?.full_name || null);
-      if (currentUser) {
-        fetchUserRole(currentUser.id).then(setRole);
-      }
-      setLoading(false);
-    });
 
-    return () => subscription.unsubscribe();
+      if (currentUser) {
+        const userRole = await fetchUserRole(currentUser.id);
+        setRole(userRole);
+      } else {
+        setRole(null);
+      }
+
+      // Initial load is complete
+      setLoading(false);
+
+      // Set up a listener for future auth state changes
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, changedSession) => {
+          const changedUser = changedSession?.user ?? null;
+          setSession(changedSession);
+          setUser(changedUser);
+          setFullName(changedUser?.user_metadata?.full_name || null);
+          
+          if (changedUser) {
+            const userRole = await fetchUserRole(changedUser.id);
+            setRole(userRole);
+          } else {
+            setRole(null);
+          }
+          // After a change, we are no longer in an initial loading state
+          setLoading(false);
+        }
+      );
+      
+      return () => subscription.unsubscribe();
+    };
+
+    initializeAuth();
   }, []);
+
 
   const signUp = async (email: string, password: string, fullName: string, selectedRole: AppRole) => {
     const redirectUrl = `${window.location.origin}/`;

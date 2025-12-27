@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
+import { Twitter, Linkedin, Facebook } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -33,19 +34,19 @@ const Footer = () => {
             <h4 className="font-semibold">Stay Connected</h4>
             <div className="flex space-x-2">
               <Button variant="outline" size="icon" asChild>
-                <a href="#" target="_blank" rel="noopener noreferrer"><i className="fab fa-twitter"></i></a>
+                <a href="#" target="_blank" rel="noopener noreferrer"><Twitter className="h-4 w-4" /></a>
               </Button>
               <Button variant="outline" size="icon" asChild>
-                <a href="#" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></a>
+                <a href="#" target="_blank" rel="noopener noreferrer"><Linkedin className="h-4 w-4" /></a>
               </Button>
               <Button variant="outline" size="icon" asChild>
-                <a href="#" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook-f"></i></a>
+                <a href="#" target="_blank" rel="noopener noreferrer"><Facebook className="h-4 w-4" /></a>
               </Button>
             </div>
           </div>
         </div>
         <div className="mt-8 border-t pt-6 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} GradHire. All rights reserved. Developed by OpenAI.</p>
+          <p>&copy; {new Date().getFullYear()} GradHire. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -4,8 +4,21 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { Search, ArrowRight, Sparkles, Users, Briefcase, Building2, CheckCircle2, GraduationCap, Target, Shield, Zap, TrendingUp, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const HeroSection = () => {
+  const { user, role } = useAuth();
+
+  const isRecruiter = user && role === 'recruiter';
+
+  const handleScrollToPostJob = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const section = document.getElementById('post-a-job');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background Elements */}
@@ -23,7 +36,7 @@ const HeroSection = () => {
           >
             <Badge variant="accent" className="mb-6 px-4 py-1.5 text-sm">
               <Sparkles className="h-4 w-4 mr-1.5" />
-              #1 Platform for Fresh Graduates
+              {isRecruiter ? "#1 Platform for Hiring Graduates" : "#1 Platform for Fresh Graduates"}
             </Badge>
           </motion.div>
 
@@ -34,7 +47,7 @@ const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6"
           >
-            Find Your Dream Job<br />
+            {isRecruiter ? "Find the Best Talent" : "Find Your Dream Job"}<br />
             <span className="text-gradient inline-block">Right After Graduation</span>
           </motion.h1>
 
@@ -45,26 +58,40 @@ const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8"
           >
-            Connect with top companies hiring freshers. Build your profile, showcase your skills, and land your first career opportunity.
+            {isRecruiter 
+              ? "Connect with top graduates and build your dream team. Post jobs, manage candidates, and hire the best."
+              : "Connect with top companies hiring freshers. Build your profile, showcase your skills, and land your first career opportunity."}
           </motion.p>
 
-          {/* Search Bar */}
+          {/* Search Bar / Post Job Button */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto mb-8"
           >
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input 
-                placeholder="Job title, keywords, or company" 
-                className="pl-12 h-14 text-base rounded-xl border-border bg-card shadow-soft focus:shadow-card"
-              />
-            </div>
-            <Button variant="hero" size="xl" className="gap-2">
-              Search Jobs <ArrowRight className="h-5 w-5" />
-            </Button>
+            {isRecruiter ? (
+              <Button variant="hero" size="xl" asChild>
+                <a href="#post-a-job" onClick={handleScrollToPostJob} className="gap-2">
+                  Post a Job <ArrowRight className="h-5 w-5" />
+                </a>
+              </Button>
+            ) : (
+              <>
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input 
+                    placeholder="Job title, keywords, or company" 
+                    className="pl-12 h-14 text-base rounded-xl border-border bg-card shadow-soft focus:shadow-card"
+                  />
+                </div>
+                <Button variant="hero" size="xl" asChild>
+                  <Link to="/jobs" className="gap-2">
+                    Search Jobs <ArrowRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+              </>
+            )}
           </motion.div>
 
           {/* Quick Stats */}
@@ -356,13 +383,13 @@ const CTASection = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="xl" asChild>
-              <Link to="/signup" className="gap-2">
+              <Link to="/auth" className="gap-2">
                 <Users className="h-5 w-5" />
                 Sign Up as Student
               </Link>
             </Button>
             <Button variant="outline-hero" size="xl" asChild>
-              <Link to="/recruiters" className="gap-2">
+              <Link to="/auth" className="gap-2">
                 <Briefcase className="h-5 w-5" />
                 Post a Job
               </Link>
@@ -391,7 +418,7 @@ const HowItWorksSection = () => {
     {
       step: "03",
       title: "Apply & Track",
-      description: "Apply to jobs with one click and track your application status in real-time.",
+      description: "Apply to your application status in real-time.",
       icon: Target,
     },
     {
