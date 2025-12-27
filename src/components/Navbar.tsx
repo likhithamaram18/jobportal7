@@ -43,10 +43,10 @@ const Navbar = () => {
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/login">Sign In</Link>
+            <Link to="/auth">Sign In</Link>
           </Button>
           <Button variant="hero" size="sm" asChild>
-            <Link to="/signup">Get Started</Link>
+            <Link to="/auth">Get Started</Link>
           </Button>
         </div>
 
@@ -80,11 +80,11 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border mt-2">
-                <Button variant="outline-hero" asChild>
-                  <Link to="/login">Sign In</Link>
+                <Button variant="outline" asChild>
+                  <Link to="/auth">Sign In</Link>
                 </Button>
                 <Button variant="hero" asChild>
-                  <Link to="/signup">Get Started</Link>
+                  <Link to="/auth">Get Started</Link>
                 </Button>
               </div>
             </nav>
