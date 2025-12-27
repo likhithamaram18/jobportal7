@@ -201,33 +201,6 @@ const StudentDashboard = () => {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero">
-              <Briefcase className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">
-              Grad<span className="text-primary">Hire</span>
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <Link to="/student/profile">
-              <Button variant="ghost" size="sm" className="gap-2">
-                <User className="h-4 w-4" />
-                Profile
-              </Button>
-            </Link>
-            <Button variant="ghost" size="sm" className="gap-2" onClick={signOut}>
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <motion.div
