@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Briefcase, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, fullName, signOut } = useAuth();
 
   const navLinks = [
     { label: "Find Jobs", href: "/jobs" },
@@ -42,12 +45,20 @@ const Navbar = () => {
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/auth">Sign In</Link>
-          </Button>
-          <Button variant="hero" size="sm" asChild>
-            <Link to="/auth">Get Started</Link>
-          </Button>
+          {user ? (
+            <Avatar>
+              <AvatarFallback>{fullName ? fullName[0].toUpperCase() : ''}</AvatarFallback>
+            </Avatar>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/auth">Sign In</Link>
+              </Button>
+              <Button variant="hero" size="sm" asChild>
+                <Link to="/auth">Get Started</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -80,12 +91,18 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border mt-2">
-                <Button variant="outline" asChild>
-                  <Link to="/auth">Sign In</Link>
-                </Button>
-                <Button variant="hero" asChild>
-                  <Link to="/auth">Get Started</Link>
-                </Button>
+                {user ? (
+                  <Button onClick={signOut}>Sign Out</Button>
+                ) : (
+                  <>
+                    <Button variant="outline" asChild>
+                      <Link to="/auth">Sign In</Link>
+                    </Button>
+                    <Button variant="hero" asChild>
+                      <Link to="/auth">Get Started</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </nav>
           </motion.div>
