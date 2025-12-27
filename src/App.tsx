@@ -49,7 +49,9 @@ const App = () => (
                 path="/student/profile"
                 element={
                   <ProtectedRoute allowedRoles={["student"]}>
-                    <StudentProfile />
+                    <ErrorBoundary>
+                      <StudentProfile />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />
