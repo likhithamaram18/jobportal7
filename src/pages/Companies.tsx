@@ -5,12 +5,12 @@ import { Building, Search } from 'lucide-react';
 
 const CompaniesPage: React.FC = () => {
   const companies = [
-    { name: 'Innovate Inc.', industry: 'Tech', location: 'San Francisco, CA', logo: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' },
-    { name: 'Quantum Solutions', industry: 'Finance', location: 'New York, NY', logo: 'https://i.pravatar.cc/150?u=a042581f4e29026704e' },
-    { name: 'BioHealth Corp.', industry: 'Biotech', location: 'Boston, MA', logo: 'https://i.pravatar.cc/150?u=a042581f4e29026704f' },
-    { name: 'Creative Minds', industry: 'Marketing', location: 'Los Angeles, CA', logo: 'https://i.pravatar.cc/150?u=a042581f4e29026704g' },
-    { name: 'GreenEnergy Co.', industry: 'Renewables', location: 'Austin, TX', logo: 'https://i.pravatar.cc/150?u=a042581f4e29026704h' },
-    { name: 'NextGen Edu', industry: 'EdTech', location: 'Chicago, IL', logo: 'https://i.pravatar.cc/150?u=a042581f4e29026704i' },
+    { name: 'Google', industry: 'Tech', location: 'Mountain View, CA' },
+    { name: 'Goldman Sachs', industry: 'Finance', location: 'New York, NY' },
+    { name: 'Pfizer', industry: 'Biotech', location: 'New York, NY' },
+    { name: 'Ogilvy', industry: 'Marketing', location: 'New York, NY' },
+    { name: 'NextEra Energy', industry: 'Renewables', location: 'Juno Beach, FL' },
+    { name: 'Coursera', industry: 'EdTech', location: 'Mountain View, CA' },
   ];
 
   return (
@@ -20,7 +20,7 @@ const CompaniesPage: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center py-20 px-4"
+        className="text-center py-24 px-4 md:py-32"
       >
         <h1 className="text-4xl md:text-6xl font-bold mb-4">
           Discover Top Companies
@@ -43,7 +43,7 @@ const CompaniesPage: React.FC = () => {
 
       {/* Companies Grid */}
       <div className="py-16 px-4 md:px-8">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {companies.map((company, index) => (
             <motion.div
               key={index}
@@ -53,7 +53,7 @@ const CompaniesPage: React.FC = () => {
               className="bg-card p-6 rounded-lg shadow-card hover:shadow-lg transition-shadow cursor-pointer"
             >
               <div className="flex items-center mb-4">
-                <img src={company.logo} alt={`${company.name} logo`} className="w-16 h-16 rounded-full mr-4" />
+                <img src={`https://logo.clearbit.com/${company.name.toLowerCase().replace(/ /g, '')}.com`} alt={`${company.name} logo`} className="w-16 h-16 rounded-full mr-4 object-contain border" />
                 <div>
                   <h3 className="text-xl font-semibold">{company.name}</h3>
                   <p className="text-primary">{company.industry}</p>
