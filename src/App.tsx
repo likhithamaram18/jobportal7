@@ -5,12 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Layout from "@/components/Layout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import StudentDashboard from "./pages/student/Dashboard";
 import StudentProfile from "./pages/student/Profile";
 import FindJobsPage from "./pages/FindJobs";
 import NotFound from "./pages/NotFound";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -22,26 +24,35 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/jobs" element={<FindJobsPage />} />
-            <Route
-              path="/student/dashboard"
-              element={
-                <ProtectedRoute allowedRoles={["student"]}>
-                  <StudentDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/student/profile"
-              element={
-                <ProtectedRoute allowedRoles={["student"]}>
-                  <StudentProfile />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/jobs"
+                element={
+                  <ErrorBoundary>
+                    <FindJobsPage />
+                  </ErrorBoundary>
+                }
+              />
+              <Route
+                path="/student/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={["student"]}>
+                    <StudentDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/profile"
+                element={
+                  <ProtectedRoute allowedRoles={["student"]}>
+                    <StudentProfile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Route>
           </Routes>
         </AuthProvider>
       </BrowserRouter>

@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, MapPin, DollarSign, Clock, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { Link } from "react-router-dom";
 
 // Assuming Job and Company types from a types file
 export interface Company {
@@ -33,7 +32,7 @@ export interface Job {
   is_remote: boolean;
   recruiter: {
     company_name: string;
-  };
+  } | null;
   created_at: string;
 }
 
@@ -43,9 +42,9 @@ const JobCard = ({ job, onApply, isApplied }: { job: Job; onApply: (jobId: strin
       <div className="flex justify-between items-start">
         <div>
           <CardTitle className="text-lg font-bold">{job.title}</CardTitle>
-          <p className="text-sm text-muted-foreground">{job.recruiter.company_name}</p>
+          <p className="text-sm text-muted-foreground">{job.recruiter?.company_name}</p>
         </div>
-        <img src={`https://logo.clearbit.com/${job.recruiter.company_name.toLowerCase().replace(/ /g, '')}.com`} alt={`${job.recruiter.company_name} logo`} className="h-12 w-12 object-contain rounded-md" />
+        <img src={`https://logo.clearbit.com/${job.recruiter?.company_name.toLowerCase().replace(/ /g, '')}.com`} alt={`${job.recruiter?.company_name} logo`} className="h-12 w-12 object-contain rounded-md" />
       </div>
     </CardHeader>
     <CardContent>
@@ -111,8 +110,13 @@ const FindJobsPage = () => {
         console.error("Error fetching jobs:", error);
         toast.error("Failed to fetch jobs.");
       } else {
-        setJobs(data as unknown as Job[]);
-        setFilteredJobs(data as unknown as Job[]);
+        // The query returns recruiter as an object, not an array, so we can cast it directly
+        const fetchedJobs = data.map(job => ({
+          ...job,
+          recruiter: job.recruiter
+        }));
+        setJobs(fetchedJobs as unknown as Job[]);
+        setFilteredJobs(fetchedJobs as unknown as Job[]);
       }
       setLoading(false);
     };
@@ -144,7 +148,7 @@ const FindJobsPage = () => {
     if (searchTerm) {
       filtered = filtered.filter(job =>
         job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.recruiter.company_name.toLowerCase().includes(searchTerm.toLowerCase())
+        job.recruiter?.company_name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -203,6 +207,7 @@ const FindJobsPage = () => {
   const uniqueJobTypes = [...new Set(jobs.map(job => job.job_type))];
 
   return (
+    <main className="flex-1">
     <div className="container mx-auto py-8 px-4 md:px-6">
       <header className="text-center mb-12">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl gradient-text">Find Your Dream Job</h1>
@@ -267,6 +272,7 @@ const FindJobsPage = () => {
         </div>
       )}
     </div>
+    </main>
   );
 };
 
