@@ -307,7 +307,7 @@ const StudentDashboard = () => {
                     job={job}
                     isSaved={savedJobs.some((s) => s.job.id === job.id)}
                     isApplied={applications.some((a) => a.job.id === job.id)}
-                    onSave={() => handleSaveJob(job..id)}
+                    onSave={() => handleSaveJob(job.id)}
                     onApply={() => handleApply(job.id)}
                   />
                 ))}
