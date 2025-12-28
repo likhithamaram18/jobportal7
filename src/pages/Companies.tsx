@@ -1,7 +1,33 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Building, Search } from 'lucide-react';
+
+// A component to handle logo fetching with a fallback
+const CompanyLogo = ({ companyName, className }: { companyName: string; className: string }) => {
+  const [hasError, setHasError] = useState(false);
+  const logoUrl = `https://logo.clearbit.com/${companyName.toLowerCase().replace(/ /g, '')}.com`;
+
+  const handleError = () => {
+    setHasError(true);
+  };
+
+  if (hasError) {
+    return (
+      <div className={`${className} flex items-center justify-center bg-muted rounded-full`}>
+        <Building className="h-8 w-8 text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={logoUrl} 
+      alt={`${companyName} logo`} 
+      className={className}
+      onError={handleError} 
+    />
+  );
+};
 
 const CompaniesPage: React.FC = () => {
   const companies = [
@@ -53,7 +79,7 @@ const CompaniesPage: React.FC = () => {
               className="bg-card p-6 rounded-lg shadow-card hover:shadow-lg transition-shadow cursor-pointer"
             >
               <div className="flex items-center mb-4">
-                <img src={`https://logo.clearbit.com/${company.name.toLowerCase().replace(/ /g, '')}.com`} alt={`${company.name} logo`} className="w-16 h-16 rounded-full mr-4 object-contain border" />
+                <CompanyLogo companyName={company.name} className="w-16 h-16 rounded-full mr-4 object-contain border" />
                 <div>
                   <h3 className="text-xl font-semibold">{company.name}</h3>
                   <p className="text-primary">{company.industry}</p>
