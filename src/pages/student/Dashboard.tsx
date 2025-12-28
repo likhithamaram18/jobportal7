@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -307,7 +307,7 @@ const StudentDashboard = () => {
                     job={job}
                     isSaved={savedJobs.some((s) => s.job.id === job.id)}
                     isApplied={applications.some((a) => a.job.id === job.id)}
-                    onSave={() => handleSaveJob(job.id)}
+                    onSave={() => handleSaveJob(job..id)}
                     onApply={() => handleApply(job.id)}
                   />
                 ))}
