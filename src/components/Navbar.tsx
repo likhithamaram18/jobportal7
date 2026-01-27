@@ -38,7 +38,7 @@ const Navbar = () => {
             <Briefcase className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="text-xl font-bold text-foreground">
-            Grad<span className="text-primary">Hire</span>
+            Job <span className="text-primary">Portal</span>
           </span>
         </Link>
 

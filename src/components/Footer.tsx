@@ -26,7 +26,7 @@ const Footer = () => {
             <h4 className="font-semibold">For Recruiters</h4>
             <ul className="space-y-1">
               <li><Link to="/recruiter/dashboard" className="text-muted-foreground hover:text-primary">Dashboard</Link></li>
-              <li><Link to="/recruiter/jobs/new" className="text-muted-foreground hover:text-primary">Post a Job</Link></li>
+              <li><Link to="/recruiter/post-job" className="text-muted-foreground hover:text-primary">Post a Job</Link></li>
               <li><Link to="/recruiter/profile" className="text-muted-foreground hover:text-primary">Company Profile</Link></li>
             </ul>
           </div>

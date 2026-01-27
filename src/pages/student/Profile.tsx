@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import ResumeUpload from "@/components/ResumeUpload";
 import {
   Briefcase,
-  ArrowLeft,
   User,
   Mail,
   Phone,
@@ -123,6 +122,7 @@ const StudentProfilePage = () => {
           skills: studentProfile.skills,
           education: studentProfile.education,
           experience: studentProfile.experience,
+          resume_url: studentProfile.resume_url,
           linkedin_url: studentProfile.linkedin_url,
           portfolio_url: studentProfile.portfolio_url,
           bio: studentProfile.bio,
@@ -139,6 +139,12 @@ const StudentProfilePage = () => {
 
     toast.success("Profile updated successfully!");
     setSaving(false);
+  };
+
+  const handleResumeUpload = (url: string) => {
+    if (studentProfile) {
+      setStudentProfile({ ...studentProfile, resume_url: url });
+    }
   };
 
   const addSkill = () => {
@@ -172,11 +178,21 @@ const StudentProfilePage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Your Profile</h1>
-            <p className="text-muted-foreground mt-1">
-              Complete your profile to stand out to recruiters
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Your Profile</h1>
+              <p className="text-muted-foreground mt-1">
+                Complete your profile to stand out to recruiters
+              </p>
+            </div>
+            <Button onClick={handleSaveProfile} disabled={saving} variant="hero">
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Save Profile
+            </Button>
           </div>
 
           {/* Basic Info */}
@@ -248,6 +264,23 @@ const StudentProfilePage = () => {
                   </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Resume Upload */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                Resume
+              </CardTitle>
+              <CardDescription>Upload your resume (PDF or Word)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResumeUpload
+                currentResumeUrl={studentProfile?.resume_url}
+                onUploadComplete={handleResumeUpload}
+              />
             </CardContent>
           </Card>
 
@@ -402,6 +435,18 @@ const StudentProfilePage = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Save Button at Bottom */}
+          <div className="flex justify-end">
+            <Button onClick={handleSaveProfile} disabled={saving} variant="hero" size="lg">
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Save All Changes
+            </Button>
+          </div>
         </motion.div>
       </main>
     </div>
