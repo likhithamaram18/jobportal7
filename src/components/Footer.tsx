@@ -9,8 +9,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
-              <img src="/logo.svg" alt="GradHire" className="h-8 w-auto" />
-              <span className="font-bold text-xl">GradHire</span>
+              <img src="/logo.svg" alt="JobPortal" className="h-8 w-auto" />
+              <span className="font-bold text-xl">Job Portal</span>
             </Link>
             <p className="text-muted-foreground">Connecting talented graduates with top companies.</p>
           </div>
